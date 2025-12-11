@@ -8,7 +8,9 @@ function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // Check login status
+  /* ---------------------------
+     CHECK LOGIN STATUS
+  --------------------------- */
   const checkLogin = () => {
     const token = localStorage.getItem("plateplanner_token");
     setLoggedIn(!!token);
@@ -17,6 +19,7 @@ function Navbar() {
   useEffect(() => {
     checkLogin();
 
+    // Update navbar on login/logout
     window.addEventListener("authChanged", checkLogin);
     window.addEventListener("storage", checkLogin);
 
@@ -26,6 +29,9 @@ function Navbar() {
     };
   }, []);
 
+  /* ---------------------------
+     LOGOUT FUNCTION
+  --------------------------- */
   const handleLogout = () => {
     localStorage.removeItem("plateplanner_token");
     localStorage.removeItem("plateplanner_userId");
@@ -40,7 +46,7 @@ function Navbar() {
     <nav className="w-full bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-6">
 
-        {/* Logo */}
+        {/* LOGO */}
         <motion.div
           initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
@@ -51,7 +57,7 @@ function Navbar() {
           <span className="text-2xl font-semibold">🥗 PlatePlanner</span>
         </motion.div>
 
-        {/* Desktop Menu */}
+        {/* DESKTOP MENU */}
         <div className="hidden md:flex gap-8 text-lg">
           <Link to="/">Home</Link>
           <Link to="/recipes">Recipes</Link>
@@ -66,7 +72,7 @@ function Navbar() {
           ) : (
             <>
               <Link to="/profile">Profile</Link>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="text-red-500 hover:text-red-700"
               >
@@ -76,7 +82,7 @@ function Navbar() {
           )}
         </div>
 
-        {/* Mobile Button */}
+        {/* MOBILE MENU BUTTON */}
         <button
           className="md:hidden block text-3xl"
           onClick={() => setOpen(!open)}
@@ -85,96 +91,66 @@ function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
-<motion.div
-  initial={{ height: 0, opacity: 0 }}
-  animate={{
-    height: open ? "auto" : 0,
-    opacity: open ? 1 : 0,
-  }}
-  className="md:hidden bg-white shadow-lg overflow-hidden rounded-b-xl"
->
-  <div className="px-6 py-4 text-lg flex flex-col gap-3">
+      {/* MOBILE MENU PANEL */}
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{
+          height: open ? "auto" : 0,
+          opacity: open ? 1 : 0,
+        }}
+        className="md:hidden bg-white shadow-lg overflow-hidden rounded-b-xl"
+      >
+        <div className="px-6 py-4 text-lg flex flex-col gap-3">
 
-    {/* Main links */}
-    <Link
-      to="/"
-      onClick={() => setOpen(false)}
-      className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
-    >
-      Home
-    </Link>
+          <Link to="/" onClick={() => setOpen(false)} className="block py-2 border-b border-gray-200">
+            Home
+          </Link>
 
-    <Link
-      to="/recipes"
-      onClick={() => setOpen(false)}
-      className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
-    >
-      Recipes
-    </Link>
+          <Link to="/recipes" onClick={() => setOpen(false)} className="block py-2 border-b border-gray-200">
+            Recipes
+          </Link>
 
-    <Link
-      to="/mealplanner"
-      onClick={() => setOpen(false)}
-      className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
-    >
-      Meal Planner
-    </Link>
+          <Link to="/mealplanner" onClick={() => setOpen(false)} className="block py-2 border-b border-gray-200">
+            Meal Planner
+          </Link>
 
-    <Link
-      to="/grocery"
-      onClick={() => setOpen(false)}
-      className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
-    >
-      Grocery
-    </Link>
+          <Link to="/grocery" onClick={() => setOpen(false)} className="block py-2 border-b border-gray-200">
+            Grocery
+          </Link>
 
-    {/* Divider */}
-    <div className="border-t border-gray-300 my-2"></div>
+          {/* Divider */}
+          <div className="border-t border-gray-300 my-2"></div>
 
-    {/* Auth: Login/Register or Profile/Logout */}
-    {!loggedIn ? (
-      <>
-        <Link
-          to="/login"
-          onClick={() => setOpen(false)}
-          className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
-        >
-          Login
-        </Link>
+          {!loggedIn ? (
+            <>
+              <Link to="/login" onClick={() => setOpen(false)} className="block py-2 border-b border-gray-200">
+                Login
+              </Link>
 
-        <Link
-          to="/register"
-          onClick={() => setOpen(false)}
-          className="block py-2 text-gray-800 hover:text-green-600"
-        >
-          Register
-        </Link>
-      </>
-    ) : (
-      <>
-        <Link
-          to="/profile"
-          onClick={() => setOpen(false)}
-          className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
-        >
-          Profile
-        </Link>
+              <Link to="/register" onClick={() => setOpen(false)} className="block py-2">
+                Register
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link to="/profile" onClick={() => setOpen(false)} className="block py-2 border-b border-gray-200">
+                Profile
+              </Link>
 
-        <button
-          onClick={() => {
-            handleLogout();
-            setOpen(false);
-          }}
-          className="block py-2 text-red-500 hover:text-red-600 text-left"
-        >
-          Logout
-        </button>
-      </>
-    )}
-  </div>
-</motion.div>
+              <button
+                onClick={() => {
+                  handleLogout();
+                  setOpen(false);
+                }}
+                className="block py-2 text-red-500 text-left"
+              >
+                Logout
+              </button>
+            </>
+          )}
 
+        </div>
+      </motion.div>
     </nav>
   );
 }
