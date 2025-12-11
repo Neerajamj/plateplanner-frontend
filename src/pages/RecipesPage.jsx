@@ -25,12 +25,15 @@ function RecipesPage() {
   useEffect(() => {
     async function fetchRecipes() {
       try {
-        let url = "import.meta.env.VITE_API_URL/recipes";
+        let base = import.meta.env.VITE_API_URL;
 
-        if (search) url = `import.meta.env.VITE_API_URL/recipes/search/${search}`;
-        if (filter) url = `import.meta.env.VITE_API_URL/recipes/filter/tag/${filter}`;
+        let url = `${base}/recipes`;
+
+        if (search) url = `${base}/recipes/search/${search}`;
+        if (filter) url = `${base}/recipes/filter/tag/${filter}`;
 
         const res = await axios.get(url);
+
         setRecipes(res.data);
         setLoading(false);
       } catch (err) {
@@ -42,7 +45,6 @@ function RecipesPage() {
     fetchRecipes();
   }, [search, filter]);
 
-  // ⭐ SKELETON LOADING UI
   if (loading)
     return (
       <div className="mt-10 px-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -59,7 +61,6 @@ function RecipesPage() {
         Explore Recipes 🍽️
       </h1>
 
-      {/* ⭐ FILTER CHIPS */}
       <motion.div
         initial={{ opacity: 0, y: -5 }}
         animate={{ opacity: 1, y: 0 }}
@@ -71,18 +72,15 @@ function RecipesPage() {
             key={f.tag}
             onClick={() => navigate(`/recipes?filter=${f.tag}`)}
             className={`px-4 py-2 rounded-full border shadow-sm transition
-              ${
-                filter === f.tag
-                  ? "bg-green-600 text-white border-green-600"
-                  : "bg-white text-gray-700 hover:bg-green-50"
-              }
+              ${filter === f.tag
+                ? "bg-green-600 text-white border-green-600"
+                : "bg-white text-gray-700 hover:bg-green-50"}
             `}
           >
             {f.label}
           </button>
         ))}
 
-        {/* ⭐ Clear Filter */}
         {filter && (
           <button
             onClick={() => navigate("/recipes")}
@@ -93,7 +91,6 @@ function RecipesPage() {
         )}
       </motion.div>
 
-      {/* ⭐ RECIPE GRID */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {recipes.map((r) => (
           <motion.div
@@ -133,6 +130,7 @@ function RecipesPage() {
           No recipes found ✨ Try another search.
         </p>
       )}
+
     </div>
   );
 }
