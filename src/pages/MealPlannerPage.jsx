@@ -1,216 +1,151 @@
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 
 function MealPlannerPage() {
-  const days = [
-    "Monday", "Tuesday", "Wednesday",
-    "Thursday", "Friday", "Saturday", "Sunday"
-  ];
+  const [recipes, setRecipes] = useState([]);
+  const [week, setWeek] = useState({
+    monday: null,
+    tuesday: null,
+    wednesday: null,
+    thursday: null,
+    friday: null,
+    saturday: null,
+    sunday: null,
+  });
 
   const userId = localStorage.getItem("plateplanner_userId");
+  const API = import.meta.env.VITE_API_URL;
 
-  const [weeklyPlan, setWeeklyPlan] = useState({});
-  const [modalOpen, setModalOpen] = useState(false);
-  const [selectedDay, setSelectedDay] = useState("");
-  const [recipes, setRecipes] = useState([]);
-
-  // If no user → show message
+  // Fetch recipes
   useEffect(() => {
-    if (!userId) {
-      console.log("No user logged in");
-    }
-  }, [userId]);
-
-  // Load existing plan
-  useEffect(() => {
-    if (!userId) return;
-    async function loadPlan() {
-      const res = await axios.get(`import.meta.env.VITE_API_URL/mealplan/get/${userId}`);
-      if (res.data && res.data.plan) {
-        setWeeklyPlan(res.data.plan);
-      }
-    }
-    loadPlan();
-  }, [userId]);
-
-  // Fetch all recipes
-  useEffect(() => {
-    async function fetchRecipes() {
-      const res = await axios.get("import.meta.env.VITE_API_URL/recipes");
-      setRecipes(res.data);
-    }
-    fetchRecipes();
+    axios.get(`${API}/recipes`).then(res => setRecipes(res.data));
   }, []);
 
-  const openModal = (day) => {
-    if (!userId) return;
-    setSelectedDay(day);
-    setModalOpen(true);
-  };
-
-  const selectRecipe = async (recipe) => {
+  // Load saved week plan
+  useEffect(() => {
     if (!userId) return;
 
-    const updatedPlan = { ...weeklyPlan, [selectedDay]: recipe };
-    setWeeklyPlan(updatedPlan);
-    setModalOpen(false);
+    axios.get(`${API}/mealplan/${userId}`)
+      .then(res => {
+        if (res.data?.week) setWeek(res.data.week);
+      })
+      .catch(() => console.log("Failed to load meal plan"));
+  }, []);
 
-    await axios.post("import.meta.env.VITE_API_URL/mealplan/save", {
-      userId,
-      plan: updatedPlan
-    });
+  // Save plan
+  const savePlan = () => {
+    axios.post(`${API}/mealplan/save`, { userId, week })
+      .then(() => alert("Saved!"))
+      .catch(() => alert("Save failed"));
   };
 
-  const removeRecipe = async (day) => {
-    if (!userId) return;
+  // Auto-generator (random 7 recipes)
+  const autoGenerate = () => {
+    if (recipes.length < 7) return alert("Need at least 7 recipes");
 
-    const updatedPlan = { ...weeklyPlan };
-    delete updatedPlan[day];
+    const selected = [...recipes]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, 7);
 
-    setWeeklyPlan(updatedPlan);
+    const newWeek = {
+      monday: selected[0],
+      tuesday: selected[1],
+      wednesday: selected[2],
+      thursday: selected[3],
+      friday: selected[4],
+      saturday: selected[5],
+      sunday: selected[6],
+    };
 
-    await axios.post("import.meta.env.VITE_API_URL/mealplan/save", {
-      userId,
-      plan: updatedPlan
-    });
+    setWeek(newWeek);
   };
 
-  const autoGenerateWeek = async () => {
-    if (!userId || !recipes.length) return;
-
-    const updatedPlan = {};
-    days.forEach((day) => {
-      const randomIndex = Math.floor(Math.random() * recipes.length);
-      updatedPlan[day] = recipes[randomIndex];
-    });
-
-    setWeeklyPlan(updatedPlan);
-
-    await axios.post("import.meta.env.VITE_API_URL/mealplan/save", {
-      userId,
-      plan: updatedPlan
-    });
-  };
-
-  if (!userId) {
-    return (
-      <div className="mt-16 text-center text-gray-600">
-        <h2 className="text-2xl font-semibold mb-2">Log in to use Meal Planner</h2>
-        <p>Go to Login, create an account, and your weekly plans will be saved for you 💚</p>
-      </div>
-    );
-  }
+  const days = [
+    "monday", "tuesday", "wednesday",
+    "thursday", "friday", "saturday", "sunday"
+  ];
 
   return (
-    <div className="mt-10 px-6 mb-20 max-w-4xl mx-auto">
+    <div className="mt-10 mb-20">
 
-      <motion.h1
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        className="text-4xl font-semibold text-center"
-      >
-        Weekly Meal Planner 🗓️
-      </motion.h1>
+      <h1 className="text-3xl font-semibold text-center mb-6">
+        Weekly Meal Planner 🍽️
+      </h1>
 
-      <p className="text-center text-gray-600 mt-2">
-        Tap a day to choose a recipe or auto-generate your week
-      </p>
-
-      <div className="flex justify-center mt-6 mb-4">
+      <div className="flex justify-center gap-4 mb-8">
         <button
-          onClick={autoGenerateWeek}
-          className="px-5 py-2 bg-green-600 text-white rounded-xl shadow hover:bg-green-700 transition"
+          onClick={autoGenerate}
+          className="px-5 py-2 bg-green-600 text-white rounded-xl"
         >
-          Auto-generate Week ✨
+          Auto Generate Week ⚡
+        </button>
+
+        <button
+          onClick={savePlan}
+          className="px-5 py-2 bg-blue-600 text-white rounded-xl"
+        >
+          Save Plan 💾
         </button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-        {days.map((day, i) => (
-          <motion.div
-            key={day}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: i * 0.05 }}
-            className="p-5 bg-white rounded-2xl shadow border"
-          >
-            <div className="flex justify-between items-center">
-              <h2 className="text-xl font-semibold mb-3">{day}</h2>
+      {/* Weekly grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+        {days.map((day) => (
+          <div key={day} className="bg-white p-4 rounded-xl shadow">
 
-              {weeklyPlan[day] && (
-                <button
-                  onClick={() => removeRecipe(day)}
-                  className="text-red-500 hover:text-red-700 text-sm"
-                >
-                  Clear ✖
-                </button>
-              )}
-            </div>
+            <h2 className="text-xl font-semibold capitalize mb-3">
+              {day}
+            </h2>
 
-            {weeklyPlan[day] ? (
-              <div
-                className="flex items-center gap-4 cursor-pointer"
-                onClick={() => openModal(day)}
-              >
-                <img
-                  src={weeklyPlan[day].image}
-                  className="w-20 h-20 object-cover rounded-xl"
-                />
-                <p className="font-medium">{weeklyPlan[day].title}</p>
-              </div>
-            ) : (
-              <div
-                className="h-24 bg-gray-50 rounded-xl flex items-center justify-center text-gray-400 cursor-pointer"
-                onClick={() => openModal(day)}
-              >
-                + Add Recipe
-              </div>
+            {/* If empty */}
+            {!week[day] && (
+              <p className="text-gray-500 text-sm">
+                Click a recipe to assign 👇
+              </p>
             )}
-          </motion.div>
+
+            {/* Show recipe */}
+            {week[day] && (
+              <motion.div className="border rounded-xl p-3 mb-3 shadow-sm">
+                <img
+                  src={week[day].image}
+                  className="w-full h-32 object-cover rounded"
+                />
+                <p className="font-medium mt-2">{week[day].title}</p>
+                <p className="text-gray-500 text-sm">
+                  {week[day].cookTime} mins • {week[day].calories} cal
+                </p>
+              </motion.div>
+            )}
+          </div>
         ))}
       </div>
 
-      {modalOpen && (
-        <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-          <motion.div
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            className="bg-white w-full max-w-lg max-h-[80vh] overflow-y-auto p-6 rounded-2xl shadow-xl"
-          >
-            <h2 className="text-xl font-semibold mb-4">
-              Select a recipe for {selectedDay}
-            </h2>
+      {/* Recipe List */}
+      <div className="mt-14">
+        <h2 className="text-2xl font-semibold mb-4 text-center">
+          Tap a recipe to assign ⬇️
+        </h2>
 
-            <div className="space-y-4">
-              {recipes.map((r) => (
-                <div
-                  key={r._id}
-                  className="flex items-center gap-4 p-3 border rounded-xl hover:bg-green-50 cursor-pointer transition"
-                  onClick={() => selectRecipe(r)}
-                >
-                  <img
-                    src={r.image}
-                    className="w-20 h-20 object-cover rounded-xl"
-                  />
-                  <div>
-                    <p className="font-semibold">{r.title}</p>
-                    <p className="text-sm text-gray-500">{r.cookTime} mins</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            <button
-              onClick={() => setModalOpen(false)}
-              className="mt-6 w-full py-2 bg-red-500 text-white rounded-xl hover:bg-red-600 transition"
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-5 px-4">
+          {recipes.map((r) => (
+            <motion.div
+              key={r._id}
+              whileHover={{ scale: 1.05 }}
+              className="bg-white p-3 rounded-xl shadow cursor-pointer"
+              onClick={() => {
+                const day = prompt("Enter day (monday-sunday):")?.toLowerCase();
+                if (!days.includes(day)) return alert("Invalid day!");
+                setWeek((prev) => ({ ...prev, [day]: r }));
+              }}
             >
-              Close
-            </button>
-          </motion.div>
+              <img src={r.image} className="h-28 w-full object-cover rounded" />
+              <p className="font-medium mt-2">{r.title}</p>
+            </motion.div>
+          ))}
         </div>
-      )}
-
+      </div>
     </div>
   );
 }
