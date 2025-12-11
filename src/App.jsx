@@ -8,6 +8,8 @@ import MealPlannerPage from "./pages/MealPlannerPage";
 import GroceryPage from "./pages/GroceryPage";
 import LoginPage from "./pages/LoginPage";
 import RegisterPage from "./pages/RegisterPage";
+import ProfilePage from "./pages/ProfilePage";
+
 
 function App() {
   return (
@@ -31,6 +33,8 @@ function App() {
           {/* Auth */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+
         </Routes>
       </div>
 
