@@ -13,9 +13,9 @@ function MealPlannerPage() {
     saturday: null,
     sunday: null,
   });
+const userId = localStorage.getItem("userId");
 
-  const userId = localStorage.getItem("plateplanner_userId");
-  const API = import.meta.env.VITE_API_URL;
+    const API = import.meta.env.VITE_API_URL;
 
   // Fetch recipes
   useEffect(() => {
