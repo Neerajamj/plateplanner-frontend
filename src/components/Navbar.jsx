@@ -1,23 +1,21 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate, useLocation } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { HiMenu, HiX } from "react-icons/hi";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false);
+  const [loggedIn, setLoggedIn] = useState(false); // FIXED
   const navigate = useNavigate();
-  const location = useLocation();
 
-  // Re-check login on every route change
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("plateplanner_token");
     setLoggedIn(!!token);
-  }, [location]);
+  }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
+    localStorage.removeItem("plateplanner_token");
+    localStorage.removeItem("plateplanner_userId");
     setLoggedIn(false);
     navigate("/");
   };
@@ -54,7 +52,7 @@ function Navbar() {
           {loggedIn && (
             <>
               <Link to="/profile" className="hover:text-green-600 transition">Profile</Link>
-              <button 
+              <button
                 onClick={handleLogout}
                 className="text-red-500 hover:text-red-700 transition"
               >
@@ -65,7 +63,7 @@ function Navbar() {
         </div>
 
         {/* Mobile Menu Button */}
-        <button 
+        <button
           className="md:hidden block text-3xl"
           onClick={() => setOpen(!open)}
         >
@@ -75,8 +73,8 @@ function Navbar() {
 
       {/* Mobile Menu */}
       {open && (
-        <motion.div 
-          initial={{ opacity: 0 }} 
+        <motion.div
+          initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           className="md:hidden bg-white shadow-md px-6 py-4 space-y-4 text-lg"
         >
@@ -95,7 +93,7 @@ function Navbar() {
           {loggedIn && (
             <>
               <Link onClick={() => setOpen(false)} to="/profile" className="block">Profile</Link>
-              <button 
+              <button
                 onClick={() => {
                   handleLogout();
                   setOpen(false);

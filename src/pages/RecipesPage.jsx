@@ -7,6 +7,7 @@ import RecipeSkeleton from "../components/RecipeSkeleton";
 function RecipesPage() {
   const [recipes, setRecipes] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [fetchError, setFetchError] = useState("");
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -25,19 +26,30 @@ function RecipesPage() {
   useEffect(() => {
     async function fetchRecipes() {
       try {
-        let base = import.meta.env.VITE_API_URL;
+        setFetchError("");
+        setLoading(true);
+
+        const base = import.meta.env.VITE_API_URL;
+        if (!base) {
+          throw new Error("VITE_API_URL is not defined (check Vercel / .env)");
+        }
 
         let url = `${base}/recipes`;
+        if (search) url = `${base}/recipes/search/${encodeURIComponent(search)}`;
+        if (filter) url = `${base}/recipes/filter/tag/${encodeURIComponent(filter)}`;
 
-        if (search) url = `${base}/recipes/search/${search}`;
-        if (filter) url = `${base}/recipes/filter/tag/${filter}`;
+        // debug: log the final URL
+        console.log("Fetching recipes from:", url);
 
-        const res = await axios.get(url);
+        const res = await axios.get(url, { timeout: 10000 });
 
-        setRecipes(res.data);
-        setLoading(false);
+        // defensive: make sure res.data is an array
+        const data = Array.isArray(res.data) ? res.data : (res.data?.recipes || []);
+        setRecipes(data);
       } catch (err) {
-        console.log("Error fetching recipes:", err);
+        console.error("Error fetching recipes:", err);
+        setFetchError("Could not load recipes. Check console/network or backend.");
+      } finally {
         setLoading(false);
       }
     }
@@ -54,9 +66,15 @@ function RecipesPage() {
       </div>
     );
 
+  if (fetchError)
+    return (
+      <div className="mt-10 text-center text-red-500">
+        {fetchError}
+      </div>
+    );
+
   return (
     <div className="mt-10 px-6 mb-20">
-
       <h1 className="text-3xl font-semibold text-center mb-6">
         Explore Recipes 🍽️
       </h1>
@@ -94,25 +112,25 @@ function RecipesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         {recipes.map((r) => (
           <motion.div
-            key={r._id}
+            key={r._id || Math.random()}
             whileHover={{ scale: 1.04 }}
             className="cursor-pointer bg-white p-4 rounded-2xl shadow hover:shadow-lg"
-            onClick={() => navigate(`/recipe/${r._id}`)}
+            onClick={() => r._id && navigate(`/recipe/${r._id}`)}
           >
             <img
-              src={r.image}
-              alt={r.title}
+              src={r.image || "/placeholder.png"}
+              alt={r.title || "Recipe"}
               className="w-full h-48 object-cover rounded-xl"
             />
 
-            <h2 className="text-xl font-semibold mt-3">{r.title}</h2>
+            <h2 className="text-xl font-semibold mt-3">{r.title || "Untitled"}</h2>
 
             <p className="text-gray-500 text-sm mt-1">
-              {r.cookTime} mins • {r.calories} cal
+              {(r.cookTime ?? "--")} mins • {(r.calories ?? "--")} cal
             </p>
 
             <div className="flex flex-wrap gap-2 mt-2">
-              {r.tags.map((tag) => (
+              {(Array.isArray(r.tags) ? r.tags : []).map((tag) => (
                 <span
                   key={tag}
                   className="px-2 py-1 bg-green-100 text-green-700 text-xs rounded"
@@ -130,7 +148,6 @@ function RecipesPage() {
           No recipes found ✨ Try another search.
         </p>
       )}
-
     </div>
   );
 }
