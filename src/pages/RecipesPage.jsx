@@ -25,10 +25,10 @@ function RecipesPage() {
   useEffect(() => {
     async function fetchRecipes() {
       try {
-        let url = "https://plateplanner-backend-1.onrender.com/recipes";
+        let url = "import.meta.env.VITE_API_URL/recipes";
 
-        if (search) url = `https://plateplanner-backend-1.onrender.com/recipes/search/${search}`;
-        if (filter) url = `https://plateplanner-backend-1.onrender.com/recipes/filter/tag/${filter}`;
+        if (search) url = `import.meta.env.VITE_API_URL/recipes/search/${search}`;
+        if (filter) url = `import.meta.env.VITE_API_URL/recipes/filter/tag/${filter}`;
 
         const res = await axios.get(url);
         setRecipes(res.data);

@@ -11,7 +11,7 @@ function RecipeDetailsPage() {
   useEffect(() => {
     async function fetchRecipe() {
       try {
-        const res = await axios.get(`https://plateplanner-backend-1.onrender.com/recipes/${id}`);
+        const res = await axios.get(`import.meta.env.VITE_API_URL/recipes/${id}`);
         setRecipe(res.data);
         setLoading(false);
       } catch (err) {

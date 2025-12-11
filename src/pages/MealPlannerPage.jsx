@@ -26,7 +26,7 @@ function MealPlannerPage() {
   useEffect(() => {
     if (!userId) return;
     async function loadPlan() {
-      const res = await axios.get(`https://plateplanner-backend-1.onrender.com/mealplan/get/${userId}`);
+      const res = await axios.get(`import.meta.env.VITE_API_URL/mealplan/get/${userId}`);
       if (res.data && res.data.plan) {
         setWeeklyPlan(res.data.plan);
       }
@@ -37,7 +37,7 @@ function MealPlannerPage() {
   // Fetch all recipes
   useEffect(() => {
     async function fetchRecipes() {
-      const res = await axios.get("https://plateplanner-backend-1.onrender.com/recipes");
+      const res = await axios.get("import.meta.env.VITE_API_URL/recipes");
       setRecipes(res.data);
     }
     fetchRecipes();
@@ -56,7 +56,7 @@ function MealPlannerPage() {
     setWeeklyPlan(updatedPlan);
     setModalOpen(false);
 
-    await axios.post("https://plateplanner-backend-1.onrender.com/mealplan/save", {
+    await axios.post("import.meta.env.VITE_API_URL/mealplan/save", {
       userId,
       plan: updatedPlan
     });
@@ -70,7 +70,7 @@ function MealPlannerPage() {
 
     setWeeklyPlan(updatedPlan);
 
-    await axios.post("https://plateplanner-backend-1.onrender.com/mealplan/save", {
+    await axios.post("import.meta.env.VITE_API_URL/mealplan/save", {
       userId,
       plan: updatedPlan
     });
@@ -87,7 +87,7 @@ function MealPlannerPage() {
 
     setWeeklyPlan(updatedPlan);
 
-    await axios.post("https://plateplanner-backend-1.onrender.com/mealplan/save", {
+    await axios.post("import.meta.env.VITE_API_URL/mealplan/save", {
       userId,
       plan: updatedPlan
     });

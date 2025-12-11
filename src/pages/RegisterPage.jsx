@@ -23,7 +23,7 @@ function RegisterPage() {
 
     try {
       setLoading(true);
-      const res = await axios.post("https://plateplanner-backend-1.onrender.com/auth/register", {
+      const res = await axios.post("import.meta.env.VITE_API_URL/auth/register", {
         username,
         password
       });

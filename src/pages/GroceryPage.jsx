@@ -23,7 +23,7 @@ function GroceryPage() {
   useEffect(() => {
     if (!userId) return;
     async function loadPlan() {
-      const res = await axios.get(`https://plateplanner-backend-1.onrender.com/mealplan/get/${userId}`);
+      const res = await axios.get(`import.meta.env.VITE_API_URL/mealplan/get/${userId}`);
       if (res.data?.plan) {
         setPlan(res.data.plan);
         generateGrocery(res.data.plan);
