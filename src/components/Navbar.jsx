@@ -8,16 +8,15 @@ function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // 🔥 Check login status
+  // Check login status
   const checkLogin = () => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem("plateplanner_token");
     setLoggedIn(!!token);
   };
 
   useEffect(() => {
     checkLogin();
 
-    // Update navbar when login/logout happens
     window.addEventListener("authChanged", checkLogin);
     window.addEventListener("storage", checkLogin);
 
@@ -28,8 +27,8 @@ function Navbar() {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
+    localStorage.removeItem("plateplanner_token");
+    localStorage.removeItem("plateplanner_userId");
 
     window.dispatchEvent(new Event("authChanged"));
 
@@ -52,22 +51,22 @@ function Navbar() {
           <span className="text-2xl font-semibold">🥗 PlatePlanner</span>
         </motion.div>
 
-        {/* ------------ DESKTOP MENU ------------ */}
+        {/* Desktop Menu */}
         <div className="hidden md:flex gap-8 text-lg">
-          <Link to="/" className="hover:text-green-600">Home</Link>
-          <Link to="/recipes" className="hover:text-green-600">Recipes</Link>
-          <Link to="/mealplanner" className="hover:text-green-600">Meal Planner</Link>
-          <Link to="/grocery" className="hover:text-green-600">Grocery</Link>
+          <Link to="/">Home</Link>
+          <Link to="/recipes">Recipes</Link>
+          <Link to="/mealplanner">Meal Planner</Link>
+          <Link to="/grocery">Grocery</Link>
 
           {!loggedIn ? (
             <>
-              <Link to="/login" className="hover:text-green-600">Login</Link>
-              <Link to="/register" className="hover:text-green-600">Register</Link>
+              <Link to="/login">Login</Link>
+              <Link to="/register">Register</Link>
             </>
           ) : (
             <>
-              <Link to="/profile" className="hover:text-green-600">Profile</Link>
-              <button
+              <Link to="/profile">Profile</Link>
+              <button 
                 onClick={handleLogout}
                 className="text-red-500 hover:text-red-700"
               >
@@ -77,7 +76,7 @@ function Navbar() {
           )}
         </div>
 
-        {/* ------------ MOBILE BUTTON ------------ */}
+        {/* Mobile Button */}
         <button
           className="md:hidden block text-3xl"
           onClick={() => setOpen(!open)}
@@ -86,7 +85,7 @@ function Navbar() {
         </button>
       </div>
 
-      {/* ------------ MOBILE MENU ------------ */}
+      {/* Mobile Menu */}
       <motion.div
         initial={{ height: 0, opacity: 0 }}
         animate={{
@@ -126,4 +125,5 @@ function Navbar() {
     </nav>
   );
 }
+
 export default Navbar;
