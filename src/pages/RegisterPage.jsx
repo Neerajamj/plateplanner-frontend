@@ -23,10 +23,12 @@ function RegisterPage() {
 
     try {
       setLoading(true);
-      const res = await axios.post("import.meta.env.VITE_API_URL/auth/register", {
-        username,
-        password
-      });
+
+      // ⭐ Correct API URL
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/register`,
+        { username, password }
+      );
 
       if (res.data.error) {
         setError(res.data.error);
@@ -57,15 +59,11 @@ function RegisterPage() {
         </p>
 
         {error && (
-          <p className="mb-4 text-red-500 text-sm text-center">
-            {error}
-          </p>
+          <p className="mb-4 text-red-500 text-sm text-center">{error}</p>
         )}
 
         {success && (
-          <p className="mb-4 text-green-600 text-sm text-center">
-            {success}
-          </p>
+          <p className="mb-4 text-green-600 text-sm text-center">{success}</p>
         )}
 
         <form onSubmit={handleRegister} className="space-y-4">
