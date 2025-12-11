@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 import { motion } from "framer-motion";
 import { HiMenu, HiX } from "react-icons/hi";
 
@@ -7,12 +7,13 @@ function Navbar() {
   const [open, setOpen] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Check user login state
+  // Re-check login on every route change
   useEffect(() => {
     const token = localStorage.getItem("token");
     setLoggedIn(!!token);
-  }, []);
+  }, [location]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
@@ -24,7 +25,7 @@ function Navbar() {
   return (
     <nav className="w-full bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-6">
-        
+
         {/* Logo */}
         <motion.div
           initial={{ opacity: 0, y: -20 }}
