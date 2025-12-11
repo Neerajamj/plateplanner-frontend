@@ -86,42 +86,95 @@ function Navbar() {
       </div>
 
       {/* Mobile Menu */}
-      <motion.div
-        initial={{ height: 0, opacity: 0 }}
-        animate={{
-          height: open ? "auto" : 0,
-          opacity: open ? 1 : 0,
-        }}
-        className="md:hidden bg-white shadow-md overflow-hidden"
-      >
-        <div className="px-6 py-4 space-y-4 text-lg">
+<motion.div
+  initial={{ height: 0, opacity: 0 }}
+  animate={{
+    height: open ? "auto" : 0,
+    opacity: open ? 1 : 0,
+  }}
+  className="md:hidden bg-white shadow-lg overflow-hidden rounded-b-xl"
+>
+  <div className="px-6 py-4 text-lg flex flex-col gap-3">
 
-          <Link to="/" onClick={() => setOpen(false)}>Home</Link>
-          <Link to="/recipes" onClick={() => setOpen(false)}>Recipes</Link>
-          <Link to="/mealplanner" onClick={() => setOpen(false)}>Meal Planner</Link>
-          <Link to="/grocery" onClick={() => setOpen(false)}>Grocery</Link>
+    {/* Main links */}
+    <Link
+      to="/"
+      onClick={() => setOpen(false)}
+      className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
+    >
+      Home
+    </Link>
 
-          {!loggedIn ? (
-            <>
-              <Link to="/login" onClick={() => setOpen(false)}>Login</Link>
-              <Link to="/register" onClick={() => setOpen(false)}>Register</Link>
-            </>
-          ) : (
-            <>
-              <Link to="/profile" onClick={() => setOpen(false)}>Profile</Link>
-              <button
-                onClick={() => {
-                  handleLogout();
-                  setOpen(false);
-                }}
-                className="text-red-500 block"
-              >
-                Logout
-              </button>
-            </>
-          )}
-        </div>
-      </motion.div>
+    <Link
+      to="/recipes"
+      onClick={() => setOpen(false)}
+      className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
+    >
+      Recipes
+    </Link>
+
+    <Link
+      to="/mealplanner"
+      onClick={() => setOpen(false)}
+      className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
+    >
+      Meal Planner
+    </Link>
+
+    <Link
+      to="/grocery"
+      onClick={() => setOpen(false)}
+      className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
+    >
+      Grocery
+    </Link>
+
+    {/* Divider */}
+    <div className="border-t border-gray-300 my-2"></div>
+
+    {/* Auth: Login/Register or Profile/Logout */}
+    {!loggedIn ? (
+      <>
+        <Link
+          to="/login"
+          onClick={() => setOpen(false)}
+          className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
+        >
+          Login
+        </Link>
+
+        <Link
+          to="/register"
+          onClick={() => setOpen(false)}
+          className="block py-2 text-gray-800 hover:text-green-600"
+        >
+          Register
+        </Link>
+      </>
+    ) : (
+      <>
+        <Link
+          to="/profile"
+          onClick={() => setOpen(false)}
+          className="block py-2 border-b border-gray-200 text-gray-800 hover:text-green-600"
+        >
+          Profile
+        </Link>
+
+        <button
+          onClick={() => {
+            handleLogout();
+            setOpen(false);
+          }}
+          className="block py-2 text-red-500 hover:text-red-600 text-left"
+        >
+          Logout
+        </button>
+      </>
+    )}
+  </div>
+</motion.div>
+
     </nav>
   );
 }
