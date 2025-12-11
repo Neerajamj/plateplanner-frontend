@@ -13,6 +13,7 @@ function LoginPage() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setError("");
+
     if (!username.trim() || !password.trim()) {
       setError("Please enter username and password");
       return;
@@ -20,19 +21,21 @@ function LoginPage() {
 
     try {
       setLoading(true);
-      const res = await axios.post("import.meta.env.VITE_API_URL/auth/login", {
-        username,
-        password
-      });
+
+      // ⭐ Correct URL
+      const res = await axios.post(
+        `${import.meta.env.VITE_API_URL}/auth/login`,
+        { username, password }
+      );
 
       if (res.data.error) {
         setError(res.data.error);
       } else {
-        // Save token & userId in localStorage
-        localStorage.setItem("plateplanner_token", res.data.token);
-        localStorage.setItem("plateplanner_userId", res.data.userId);
 
-        // Go to meal planner (or home)
+        // ⭐ Correct localStorage keys
+        localStorage.setItem("token", res.data.token);
+        localStorage.setItem("userId", res.data.userId);
+
         navigate("/mealplanner");
       }
 
