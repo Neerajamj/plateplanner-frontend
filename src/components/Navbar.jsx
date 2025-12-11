@@ -8,24 +8,31 @@ function Navbar() {
   const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
 
-  // 🔥 Check login on load + whenever storage changes
-  useEffect(() => {
-    function checkLogin() {
-      const token = localStorage.getItem("token");
-      setLoggedIn(!!token);
-    }
+  // 🔥 Check login status
+  const checkLogin = () => {
+    const token = localStorage.getItem("token");
+    setLoggedIn(!!token);
+  };
 
+  useEffect(() => {
     checkLogin();
 
-    // Listen to login/logout changes
+    // Update navbar when login/logout happens
+    window.addEventListener("authChanged", checkLogin);
     window.addEventListener("storage", checkLogin);
 
-    return () => window.removeEventListener("storage", checkLogin);
+    return () => {
+      window.removeEventListener("authChanged", checkLogin);
+      window.removeEventListener("storage", checkLogin);
+    };
   }, []);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+
+    window.dispatchEvent(new Event("authChanged"));
+
     setLoggedIn(false);
     navigate("/");
   };
@@ -33,9 +40,10 @@ function Navbar() {
   return (
     <nav className="w-full bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-6">
-        
+
+        {/* Logo */}
         <motion.div
-          initial={{ opacity: 0, y: -20 }}
+          initial={{ opacity: 0, y: -15 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="flex items-center gap-2 cursor-pointer"
@@ -44,24 +52,24 @@ function Navbar() {
           <span className="text-2xl font-semibold">🥗 PlatePlanner</span>
         </motion.div>
 
-        {/* Desktop Menu */}
+        {/* ------------ DESKTOP MENU ------------ */}
         <div className="hidden md:flex gap-8 text-lg">
-          <Link to="/">Home</Link>
-          <Link to="/recipes">Recipes</Link>
-          <Link to="/mealplanner">Meal Planner</Link>
-          <Link to="/grocery">Grocery</Link>
+          <Link to="/" className="hover:text-green-600">Home</Link>
+          <Link to="/recipes" className="hover:text-green-600">Recipes</Link>
+          <Link to="/mealplanner" className="hover:text-green-600">Meal Planner</Link>
+          <Link to="/grocery" className="hover:text-green-600">Grocery</Link>
 
           {!loggedIn ? (
             <>
-              <Link to="/login">Login</Link>
-              <Link to="/register">Register</Link>
+              <Link to="/login" className="hover:text-green-600">Login</Link>
+              <Link to="/register" className="hover:text-green-600">Register</Link>
             </>
           ) : (
             <>
-              <Link to="/profile">Profile</Link>
-              <button 
+              <Link to="/profile" className="hover:text-green-600">Profile</Link>
+              <button
                 onClick={handleLogout}
-                className="text-red-500"
+                className="text-red-500 hover:text-red-700"
               >
                 Logout
               </button>
@@ -69,7 +77,8 @@ function Navbar() {
           )}
         </div>
 
-        <button 
+        {/* ------------ MOBILE BUTTON ------------ */}
+        <button
           className="md:hidden block text-3xl"
           onClick={() => setOpen(!open)}
         >
@@ -77,17 +86,21 @@ function Navbar() {
         </button>
       </div>
 
-      {/* Mobile Menu */}
-      {open && (
-        <motion.div 
-          initial={{ opacity: 0 }} 
-          animate={{ opacity: 1 }}
-          className="md:hidden bg-white shadow-md px-6 py-4 space-y-4 text-lg"
-        >
-          <Link onClick={() => setOpen(false)} to="/">Home</Link>
-          <Link onClick={() => setOpen(false)} to="/recipes">Recipes</Link>
-          <Link onClick={() => setOpen(false)} to="/mealplanner">Meal Planner</Link>
-          <Link onClick={() => setOpen(false)} to="/grocery">Grocery</Link>
+      {/* ------------ MOBILE MENU ------------ */}
+      <motion.div
+        initial={{ height: 0, opacity: 0 }}
+        animate={{
+          height: open ? "auto" : 0,
+          opacity: open ? 1 : 0,
+        }}
+        className="md:hidden bg-white shadow-md overflow-hidden"
+      >
+        <div className="px-6 py-4 space-y-4 text-lg">
+
+          <Link to="/" onClick={() => setOpen(false)}>Home</Link>
+          <Link to="/recipes" onClick={() => setOpen(false)}>Recipes</Link>
+          <Link to="/mealplanner" onClick={() => setOpen(false)}>Meal Planner</Link>
+          <Link to="/grocery" onClick={() => setOpen(false)}>Grocery</Link>
 
           {!loggedIn ? (
             <>
@@ -97,7 +110,7 @@ function Navbar() {
           ) : (
             <>
               <Link to="/profile" onClick={() => setOpen(false)}>Profile</Link>
-              <button 
+              <button
                 onClick={() => {
                   handleLogout();
                   setOpen(false);
@@ -108,8 +121,8 @@ function Navbar() {
               </button>
             </>
           )}
-        </motion.div>
-      )}
+        </div>
+      </motion.div>
     </nav>
   );
 }
