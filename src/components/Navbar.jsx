@@ -5,17 +5,27 @@ import { HiMenu, HiX } from "react-icons/hi";
 
 function Navbar() {
   const [open, setOpen] = useState(false);
-  const [loggedIn, setLoggedIn] = useState(false); // FIXED
+  const [loggedIn, setLoggedIn] = useState(false);
   const navigate = useNavigate();
 
+  // 🔥 Check login on load + whenever storage changes
   useEffect(() => {
-    const token = localStorage.getItem("plateplanner_token");
-    setLoggedIn(!!token);
+    function checkLogin() {
+      const token = localStorage.getItem("token");
+      setLoggedIn(!!token);
+    }
+
+    checkLogin();
+
+    // Listen to login/logout changes
+    window.addEventListener("storage", checkLogin);
+
+    return () => window.removeEventListener("storage", checkLogin);
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("plateplanner_token");
-    localStorage.removeItem("plateplanner_userId");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
     setLoggedIn(false);
     navigate("/");
   };
@@ -23,8 +33,7 @@ function Navbar() {
   return (
     <nav className="w-full bg-white shadow-sm sticky top-0 z-50">
       <div className="max-w-6xl mx-auto flex items-center justify-between py-4 px-6">
-
-        {/* Logo */}
+        
         <motion.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
@@ -37,24 +46,22 @@ function Navbar() {
 
         {/* Desktop Menu */}
         <div className="hidden md:flex gap-8 text-lg">
-          <Link to="/" className="hover:text-green-600 transition">Home</Link>
-          <Link to="/recipes" className="hover:text-green-600 transition">Recipes</Link>
-          <Link to="/mealplanner" className="hover:text-green-600 transition">Meal Planner</Link>
-          <Link to="/grocery" className="hover:text-green-600 transition">Grocery</Link>
+          <Link to="/">Home</Link>
+          <Link to="/recipes">Recipes</Link>
+          <Link to="/mealplanner">Meal Planner</Link>
+          <Link to="/grocery">Grocery</Link>
 
-          {!loggedIn && (
+          {!loggedIn ? (
             <>
-              <Link to="/login" className="hover:text-green-600 transition">Login</Link>
-              <Link to="/register" className="hover:text-green-600 transition">Register</Link>
+              <Link to="/login">Login</Link>
+              <Link to="/register">Register</Link>
             </>
-          )}
-
-          {loggedIn && (
+          ) : (
             <>
-              <Link to="/profile" className="hover:text-green-600 transition">Profile</Link>
-              <button
+              <Link to="/profile">Profile</Link>
+              <button 
                 onClick={handleLogout}
-                className="text-red-500 hover:text-red-700 transition"
+                className="text-red-500"
               >
                 Logout
               </button>
@@ -62,8 +69,7 @@ function Navbar() {
           )}
         </div>
 
-        {/* Mobile Menu Button */}
-        <button
+        <button 
           className="md:hidden block text-3xl"
           onClick={() => setOpen(!open)}
         >
@@ -73,27 +79,25 @@ function Navbar() {
 
       {/* Mobile Menu */}
       {open && (
-        <motion.div
-          initial={{ opacity: 0 }}
+        <motion.div 
+          initial={{ opacity: 0 }} 
           animate={{ opacity: 1 }}
           className="md:hidden bg-white shadow-md px-6 py-4 space-y-4 text-lg"
         >
-          <Link onClick={() => setOpen(false)} to="/" className="block">Home</Link>
-          <Link onClick={() => setOpen(false)} to="/recipes" className="block">Recipes</Link>
-          <Link onClick={() => setOpen(false)} to="/mealplanner" className="block">Meal Planner</Link>
-          <Link onClick={() => setOpen(false)} to="/grocery" className="block">Grocery</Link>
+          <Link onClick={() => setOpen(false)} to="/">Home</Link>
+          <Link onClick={() => setOpen(false)} to="/recipes">Recipes</Link>
+          <Link onClick={() => setOpen(false)} to="/mealplanner">Meal Planner</Link>
+          <Link onClick={() => setOpen(false)} to="/grocery">Grocery</Link>
 
-          {!loggedIn && (
+          {!loggedIn ? (
             <>
-              <Link onClick={() => setOpen(false)} to="/login" className="block">Login</Link>
-              <Link onClick={() => setOpen(false)} to="/register" className="block">Register</Link>
+              <Link to="/login" onClick={() => setOpen(false)}>Login</Link>
+              <Link to="/register" onClick={() => setOpen(false)}>Register</Link>
             </>
-          )}
-
-          {loggedIn && (
+          ) : (
             <>
-              <Link onClick={() => setOpen(false)} to="/profile" className="block">Profile</Link>
-              <button
+              <Link to="/profile" onClick={() => setOpen(false)}>Profile</Link>
+              <button 
                 onClick={() => {
                   handleLogout();
                   setOpen(false);

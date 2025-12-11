@@ -11,11 +11,17 @@ function RecipeDetailsPage() {
   useEffect(() => {
     async function fetchRecipe() {
       try {
-        const res = await axios.get(`import.meta.env.VITE_API_URL/recipes/${id}`);
+        const base = import.meta.env.VITE_API_URL;  // ✅ Correct
+        const url = `${base}/recipes/${id}`;        // ✅ Correct
+
+        console.log("Fetching recipe details from:", url);
+
+        const res = await axios.get(url);
         setRecipe(res.data);
-        setLoading(false);
+
       } catch (err) {
         console.log("Error fetching recipe:", err);
+      } finally {
         setLoading(false);
       }
     }
@@ -33,6 +39,7 @@ function RecipeDetailsPage() {
 
   return (
     <div className="mt-10 px-6 mb-20 max-w-3xl mx-auto">
+
       {/* Title */}
       <motion.h1
         initial={{ opacity: 0, y: -10 }}
@@ -85,6 +92,7 @@ function RecipeDetailsPage() {
           <li key={index}>{step}</li>
         ))}
       </ol>
+
     </div>
   );
 }
