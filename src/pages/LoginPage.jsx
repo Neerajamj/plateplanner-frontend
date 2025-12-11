@@ -22,19 +22,18 @@ function LoginPage() {
     try {
       setLoading(true);
 
-      // ⭐ Correct URL
-      const res = await axios.post(
-        `${import.meta.env.VITE_API_URL}/auth/login`,
-        { username, password }
-      );
+      const url = `${import.meta.env.VITE_API_URL}/auth/login`;
+
+      const res = await axios.post(url, {
+        username,
+        password
+      });
 
       if (res.data.error) {
         setError(res.data.error);
       } else {
-
-        // ⭐ Correct localStorage keys
-        localStorage.setItem("token", res.data.token);
-        localStorage.setItem("userId", res.data.userId);
+        localStorage.setItem("plateplanner_token", res.data.token);
+        localStorage.setItem("plateplanner_userId", res.data.userId);
 
         navigate("/mealplanner");
       }
@@ -56,15 +55,12 @@ function LoginPage() {
         <h1 className="text-2xl font-semibold text-center mb-2">
           Welcome back 👋
         </h1>
+
         <p className="text-center text-gray-500 mb-6">
           Log in to see your meal plan & grocery list
         </p>
 
-        {error && (
-          <p className="mb-4 text-red-500 text-sm text-center">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-red-500 text-center">{error}</p>}
 
         <form onSubmit={handleLogin} className="space-y-4">
           <div>
@@ -74,7 +70,6 @@ function LoginPage() {
               className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              autoComplete="username"
             />
           </div>
 
@@ -85,20 +80,19 @@ function LoginPage() {
               className="w-full border rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-green-400"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              autoComplete="current-password"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-2.5 rounded-xl bg-green-600 text-white font-medium hover:bg-green-700 transition disabled:opacity-60"
+            className="w-full mt-2 py-2.5 rounded-xl bg-green-600 text-white hover:bg-green-700"
           >
             {loading ? "Logging in..." : "Log In"}
           </button>
         </form>
 
-        <p className="text-center text-sm text-gray-500 mt-4">
+        <p className="text-center mt-4">
           Don’t have an account?{" "}
           <Link to="/register" className="text-green-600 hover:underline">
             Create one
