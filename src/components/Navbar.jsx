@@ -33,8 +33,8 @@ function Navbar() {
      LOGOUT FUNCTION
   --------------------------- */
   const handleLogout = () => {
-    localStorage.removeItem("plateplanner_token");
-    localStorage.removeItem("plateplanner_userId");
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
 
     window.dispatchEvent(new Event("authChanged"));
 
