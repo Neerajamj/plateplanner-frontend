@@ -12,7 +12,7 @@ function Navbar() {
      CHECK LOGIN STATUS
   --------------------------- */
   const checkLogin = () => {
-    const token = localStorage.getItem("plateplanner_token");
+    const token = localStorage.getItem("token");
     setLoggedIn(!!token);
   };
 
@@ -39,7 +39,7 @@ function Navbar() {
     window.dispatchEvent(new Event("authChanged"));
 
     setLoggedIn(false);
-    navigate("/");
+    navigate("/mealplanner");
   };
 
   return (
