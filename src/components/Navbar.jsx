@@ -39,7 +39,7 @@ function Navbar() {
     window.dispatchEvent(new Event("authChanged"));
 
     setLoggedIn(false);
-    navigate("/mealplanner");
+    navigate("/");
   };
 
   return (
